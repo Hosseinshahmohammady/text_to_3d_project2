@@ -1,0 +1,32 @@
+<h2>جستجوی مدل سه‌بعدی رایگان از Sketchfab</h2>
+<form method="post">
+  {% csrf_token %} {{ form.as_p }}
+  <button type="submit">جستجو</button>
+</form>
+
+{% if models %}
+<h3>نتایج:</h3>
+<ul>
+  {% for model in models %}
+  <li>
+    <strong>{{ model.name }}</strong><br />
+    <a href="{{ model.url }}" target="_blank">باز کردن در Sketchfab</a
+    ><br /><br />
+
+    <!-- نمایش مدل داخل صفحه -->
+    <iframe
+      title="{{ model.name }}"
+      width="640"
+      height="480"
+      src="https://sketchfab.com/models/{{ model.uid }}/embed"
+      frameborder="0"
+      allow="autoplay; fullscreen; vr"
+      mozallowfullscreen="true"
+      webkitallowfullscreen="true"
+    >
+    </iframe>
+    <hr />
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}

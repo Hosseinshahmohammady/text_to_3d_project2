@@ -30,4 +30,4 @@ def text_view(request):
                     })
     else:
         form = TextForm()
-    return render(request, 'modelviewer/search.html', {'form': form, 'models': model_links})
+    return render(request, 'textto3d/search.html', {'form': form, 'models': model_links})
