@@ -25,8 +25,11 @@
       webkitallowfullscreen="true"
     >
     </iframe>
+
     <hr />
   </li>
   {% endfor %}
 </ul>
+{% endif %} {% if models|length == 0 %}
+<p style="color: red">هیچ مدلی پیدا نشد. لطفاً یه پرومت عمومی‌تر امتحان کن.</p>
 {% endif %}

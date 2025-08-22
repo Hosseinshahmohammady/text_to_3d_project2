@@ -2,7 +2,6 @@ from django.shortcuts import render
 from .forms import TextForm
 import requests
 
-
 SKETCHFAB_API_TOKEN = 'db6c4cf57537445c9bb55df893c274ec'
 
 def text_view(request):
@@ -12,22 +11,45 @@ def text_view(request):
         if form.is_valid():
             prompt = form.cleaned_data['prompt']
             headers = {
-                'Authorization': f'Token {'db6c4cf57537445c9bb55df893c274ec'}'
+                'Authorization': f'Token {SKETCHFAB_API_TOKEN}'
             }
             params = {
-                'q': prompt,
-                'downloadable': True,
-                'license': 'CC0'
+                'q': prompt
             }
-            response = requests.get('https://api.sketchfab.com/v3/search', headers=headers, params=params)
+            response = requests.get(
+                'https://api.sketchfab.com/v3/models',
+                headers=headers,
+                params={'search': prompt}
+            )
+
+
+            print("وضعیت پاسخ:", response.status_code)
+            print("متن خام پاسخ:", response.text)
+
             if response.status_code == 200:
-                results = response.json().get('results', [])
-                for item in results:
-                    model_links.append({
-                        'name': item['name'],
-                        'url': item['viewerUrl'],
-                        'uid': item['uid']  # برای نمایش در iframe
-                    })
+                try:
+                    data = response.json()
+                    results = data.get('results', [])
+                    print("نوع داده‌ی results:", type(results))
+
+                    if isinstance(results, list):
+                        for item in results:
+                            if isinstance(item, dict):
+                                model_links.append({
+                                    'name': item.get('name'),
+                                    'url': item.get('viewerUrl'),
+                                    'uid': item.get('uid')
+                                })
+                                print("مدل:", item.get('name'), "| UID:", item.get('uid'))
+                            else:
+                                print("⚠️ item رشته است، نه دیکشنری:", item)
+                    else:
+                        print("⚠️ results لیست نیست:", results)
+                except Exception as e:
+                    print("⚠️ خطا در تبدیل JSON:", e)
+            else:
+                print("⚠️ پاسخ ناموفق از API:", response.status_code)
     else:
         form = TextForm()
+
     return render(request, 'textto3d/search.html', {'form': form, 'models': model_links})
